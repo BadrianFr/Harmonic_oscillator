@@ -13,15 +13,20 @@ from matplotlib.patches import Circle
 import Fjeder_Fysik as fysik
 import Animation as Ani
 from matplotlib.gridspec import GridSpec
+from matplotlib.widgets import Button
+
+
+paused=True
+current_frame = 0
 
 #fysikken
-fjeder = fysik.Fjeder(0, 10)
+fjeder = fysik.Fjeder(0, 500)
 lod = fysik.Lod(1,0.5)
 
 m = fysik.getSamletMasse(fjeder, lod)
 
 omega = fysik.getVinkelhastighed(fjeder, lod, m)
-dæmp = 0.00
+dæmp = 0.4
 A = 10
 
 #tidsindtillinger
@@ -87,14 +92,22 @@ def init_func():
     line.set_data([], [])
     v_line.set_data([], [])
     a_line.set_data([], [])
-    mid_line, = ax1.plot(ax1.get_xlim(), [0, 0], color='black', linestyle='--', linewidth=2, alpha=0.25, label="Ligevægt")
-    ax1.legend()
+    
     
     return point, line, v_line, a_line
 
 #update
 def update_plot(i):
-    t = t_values[i]
+    if paused:
+        return point, line, v_line, a_line
+    
+    global current_frame
+    t = t_values[current_frame]
+    current_frame += 1
+    
+    if current_frame >= len(t_values):
+        current_frame = 0
+        
     y = fysik.getSted(t, A, omega, dæmp)
     v = fysik.getHastighed(t, A, omega, dæmp)
     a = fysik.getAcceleration(t, A, omega, dæmp)
@@ -112,14 +125,32 @@ def update_plot(i):
     
     return point, line, v_line, a_line
 
+mid_line, = ax1.plot(ax1.get_xlim(), [0, 0], color='black', linestyle='--', linewidth=2, alpha=0.25, label="Ligevægt")
+ax1.legend()
+
 #animatoin
 anim = FuncAnimation(fig,
                      update_plot,
-                     frames=len(t_values),
+                     frames=len(t_values)   ,
                      init_func=init_func,
                      interval=dt*1000,  # ms
                      blit=True)
+fig.canvas.draw()
+anim.event_source.stop()  # vigtig
 
+# knap
+ax_button = plt.axes([0.4, 0.05, 0.2, 0.1])
+button = Button(ax_button, "Start")
+
+def start_reset(event):
+    global paused, current_frame
+    paused = False       # animation starter
+    current_frame = 0    # reset til t = 0
+    t_data.clear()       # ryd historik
+    v_data.clear()
+    a_data.clear()
+
+button.on_clicked(start_reset)
 
 
 plt.show()
