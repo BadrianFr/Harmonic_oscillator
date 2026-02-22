@@ -8,7 +8,7 @@ Created on Fri Jan 16 09:09:14 2026
 from dataclasses import dataclass
 import math
 
-g=9.82 #m/s^2 
+g=-9.82 #m/s^2 
 
 @dataclass
 class Fjeder:
@@ -50,7 +50,7 @@ def getVinkelhastighed(fjeder, lod, m):
     return math.sqrt(k / m)
 
 def getSted(t, A, omega, dæmp):
-    return A*math.e**(-dæmp*t) * math.cos(omega * t)
+    return A*math.e**(-dæmp*t) * math.sin(omega * t)
 
 
 def getHastighed(t, A, omega, dæmp):

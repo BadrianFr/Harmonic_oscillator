@@ -20,13 +20,13 @@ paused=True
 current_frame = 0
 
 #fysikken
-fjeder = fysik.Fjeder(0, 500)
+fjeder = fysik.Fjeder(0, 5)
 lod = fysik.Lod(1,0.5)
 
 m = fysik.getSamletMasse(fjeder, lod)
 
 omega = fysik.getVinkelhastighed(fjeder, lod, m)
-dæmp = 0.4
+dæmp = 0
 A = 10
 
 #tidsindtillinger
